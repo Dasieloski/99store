@@ -64,8 +64,12 @@ export default function AdminLayout({
     { path: "/admin/products", label: "📦 Productos", emoji: "📦" },
     { path: "/admin/offers", label: "🔥 Ofertas", emoji: "🔥" },
     { path: "/admin/currencies", label: "💰 Monedas", emoji: "💰" },
-    { path: "/admin/stock", label: "📦 Gestión de Stock", emoji: "📦" },
+    { path: "/admin/gran-almacen", label: "🏭 Gran Almacén", emoji: "🏭" },
+    { path: "/admin/almacen-ventas", label: "🏪 Almacén de Ventas", emoji: "🏪" },
+    { path: "/admin/warehouse-transfer", label: "🚚 Transferencia de Almacén", emoji: "🚚" },
+    { path: "/admin/historial", label: "📜 Historial", emoji: "📜" },
     { path: "/admin/carts", label: "🛒 Carritos de Clientes", emoji: "🛒" },
+    { path: "/admin/devoluciones", label: "🔄 Devoluciones", emoji: "🔄" },
   ]
 
   return (

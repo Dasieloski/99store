@@ -37,19 +37,21 @@ model Category {
 
 // Producto
 model Product {
-  id                  String   @id @default(cuid())
+  id                  String         @id @default(cuid())
   name                String
-  price               Decimal  @db.Decimal(10, 2)
+  price               Decimal        @db.Decimal(10, 2)
   image               String
   categoryId          String
   description         String
   emoji               String
-  detailedDescription String?  @db.Text
-  stock               Int      @default(0)
-  category            Category @relation(fields: [categoryId], references: [id])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  detailedDescription String?        @db.Text
+  stock               Int            @default(0) // Stock principal
+  category            Category       @relation(fields: [categoryId], references: [id])
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
   Offer               Offer[]
+  AlmacenVentas       AlmacenVentas?
+  SaleProduct         SaleProduct[]
 
   @@map("products")
 }
@@ -118,4 +120,53 @@ model OrderItem {
   quantity  Int
   order     Order  @relation(fields: [orderId], references: [id])
   orderId   Int
+}
+
+model AlmacenVentas {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String   @unique
+  stock     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("almacen_ventas")
+}
+
+model Sale {
+  id            Int             @id @default(autoincrement())
+  total         Float
+  paymentMethod String
+  products      SaleProduct[]
+  status        String          @default("completed")
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  ReturnRequest ReturnRequest[]
+}
+
+model SaleProduct {
+  id        Int     @id @default(autoincrement())
+  saleId    Int
+  productId String // Cambiado de Int a String
+  quantity  Int
+  price     Float
+  sale      Sale    @relation(fields: [saleId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model ReturnRequest {
+  id        Int          @id @default(autoincrement())
+  sale      Sale         @relation(fields: [saleId], references: [id])
+  saleId    Int
+  products  Json
+  total     Float
+  status    ReturnStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+enum ReturnStatus {
+  PENDING
+  AUTHORIZED
+  REJECTED
 }

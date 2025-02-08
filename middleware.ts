@@ -13,6 +13,24 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin/auth/login', request.url))
     }
 
+
+   // Check if the user is accessing employee routes
+  if (request.nextUrl.pathname.startsWith("/empleado")) {
+    // Skip middleware for login page
+    if (request.nextUrl.pathname === "/empleado/login") {
+      return NextResponse.next()
+    }
+
+    // Check for authentication (replace with your actual auth check)
+    const isAuthenticated = request.cookies.has("employee_session")
+
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/empleado/login", request.url))
+    }
+  }
+
+
+
     // Aquí podrías verificar la validez del token sin usar Prisma,
     // por ejemplo, utilizando una función signada previamente.
 
@@ -30,6 +48,10 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/((?!api|_next/static|_next/image|favicon.ico|admin/auth/login).*)',
+    //'/((?!api|_next/static|_next/image|favicon.ico|empleado/login).*)',
+    "/empleado/:path*"
+    
+    
   ],
 }
 

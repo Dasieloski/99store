@@ -4,27 +4,55 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-// Obtener el stock de todos los productos
 export async function GET() {
-    try {
-        const products = await prisma.product.findMany({
-            select: {
-                id: true,
-                name: true,
-                image: true,
-                stock: true,
-                category: { select: { name: true } },
-            },
-            orderBy: {
-                name: 'asc',
-            },
+  try {
+    // Obtener todos los productos con AlmacénVentas y categoría
+    const productos = await prisma.product.findMany({
+      include: {
+        AlmacenVentas: true,
+        category: {
+          select: { name: true }
+        }
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
+
+    // Crear AlmacénVentas para productos que no lo tengan
+    for (const producto of productos) {
+      if (!producto.AlmacenVentas) {
+        await prisma.almacenVentas.create({
+          data: {
+            productId: producto.id,
+            stock: 0,
+          }
         })
-        console.log('Productos enviados al frontend:', products)
-        return NextResponse.json(products, { status: 200 })
-    } catch (error: any) {
-        console.error('Error al obtener el stock de los productos:', error.message || error)
-        return NextResponse.json({ error: 'Error al obtener el stock de los productos' }, { status: 500 })
+      }
     }
+
+    // Obtener productos actualizados
+    const productosActualizados = await prisma.product.findMany({
+      include: {
+        AlmacenVentas: true,
+        category: {
+          select: { name: true }
+        }
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    })
+
+    console.log('Productos enviados al frontend:', productosActualizados)
+    return NextResponse.json(productosActualizados, { status: 200 })
+  } catch (error: any) {
+    console.error('Error al obtener el stock de los productos:', error.message || error)
+    return NextResponse.json(
+      { error: 'Error al obtener el stock de los productos' },
+      { status: 500 }
+    )
+  }
 }
 
 // Actualizar el stock de un producto específico
@@ -44,12 +72,11 @@ export async function PATCH(request: Request) {
         const updatedProduct = await prisma.product.update({
             where: { id },
             data: { stock: stockInt },
-            select: {
-                id: true,
-                name: true,
-                image: true,
-                stock: true,
-                category: { select: { name: true } },
+            include: {
+                AlmacenVentas: true, // Incluir AlmacenVentas después de la actualización
+                category: {
+                    select: { name: true }
+                }
             },
         })
 

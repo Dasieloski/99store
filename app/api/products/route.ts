@@ -29,13 +29,14 @@ export async function GET(request: Request) {
                         }
                     }
                 },
-                include: { category: true },
+                include: { category: true, AlmacenVentas: true },
             })
         } else {
             productos = await prisma.product.findMany({
-                include: { category: true },
+                include: { category: true, AlmacenVentas: true },
             })
         }
+
 
         if (!productos || productos.length === 0) {
             return NextResponse.json({ error: 'No se encontraron productos' }, { status: 404 })
@@ -105,8 +106,13 @@ export async function POST(request: Request) {
                 emoji,
                 detailedDescription: detailedDescription || description,
                 image: imageUrl,
+                AlmacenVentas: {
+                    create: {
+                        stock: 0, // Inicializar stock en Almacén de Ventas
+                    }
+                }
             },
-            include: { category: true },
+            include: { category: true, AlmacenVentas: true },
         })
 
         return NextResponse.json(newProduct, { status: 201 })

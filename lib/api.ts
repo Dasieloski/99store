@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { Offer } from "@prisma/client"
 
 export interface OfferInput {
@@ -64,4 +65,48 @@ export async function deleteOffer(id: string) {
         throw new Error('Error al eliminar la oferta.')
     }
     return response.json()
+}
+
+export const fetchCategories = async (): Promise<Category[]> => {
+  const res = await fetch('/api/categories') // Asegúrate de tener esta ruta
+  if (!res.ok) throw new Error('Error al obtener categorías')
+  return res.json()
+}
+
+export const fetchSales = async (): Promise<Sale[]> => {
+  const res = await fetch('/api/sales')
+  if (!res.ok) throw new Error('Error al obtener ventas')
+  return res.json()
+}
+
+interface CreateReturnRequestInput {
+  saleId: number
+  products: Array<{ productId: string, quantity: number }>
+  total: number
+}
+
+export const createReturnRequest = async (input: CreateReturnRequestInput): Promise<ReturnRequest> => {
+  const res = await fetch('/api/returns', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+  })
+  if (!res.ok) throw new Error('Error al crear solicitud de devolución')
+  return res.json()
+}
+
+export const fetchReturnRequests = async (): Promise<ReturnRequest[]> => {
+  const res = await fetch('/api/returns')
+  if (!res.ok) throw new Error('Error al obtener devoluciones')
+  return res.json()
+}
+
+export const authorizeReturnRequest = async (id: number, status: "AUTHORIZED" | "REJECTED"): Promise<ReturnRequest> => {
+  const res = await fetch(`/api/returns/${id}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  })
+  if (!res.ok) throw new Error('Error al autorizar devolución')
+  return res.json()
 }

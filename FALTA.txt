@@ -1,0 +1,6 @@
+1-arreglar las categorias de almacen (/empleado)
+2-Terminar de configurar las devoluciones
+3-Poner a funcionar el login y proteccion de rutas
+4-Terminar el Historial de admin
+5-modificar la pagina principal de admin para mostrar mas info
+6-modificar el frontend de toda la pagina
